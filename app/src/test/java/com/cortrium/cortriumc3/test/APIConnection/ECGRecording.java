@@ -1,4 +1,4 @@
-package com.cortrium.cortriumc3.APIConnection;
+package com.cortrium.cortriumc3.test.APIConnection;
 
 import com.google.gson.annotations.SerializedName;
 
