@@ -4,6 +4,7 @@
 
 #Allow versions folder
 !version/
+!version/*
 
 # Files for the ART/Dalvik VM
 *.dex
