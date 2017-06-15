@@ -1,0 +1,30 @@
+{
+  "start": "2016-10-19T14:27:17.000 +0200",
+  "filename": "580766A5.BLE",
+  "device": [
+    "identifier": "C3-FE9D7913F5D4",
+    "firmwareversion": "Apr 20 2016",
+    "softwareversion": "0.3.9.8",
+    "hardwareversion": "B7",
+    "gain": 6,
+    "samplingrate": 250
+  ],
+  "patient": [
+    "identifier": "XXXXXX-XXXX",
+    "firstname": "John",
+    "lastname": "Doe",
+    "gender": "Male",
+    "dob": 1978-10-10
+  ],
+  "events": [{
+    "identifier": "F9551D9D-C22E-4348-A351-AEABD272B3BC",
+    "name": "Test Event",
+    "serial": 295,
+    "start": "2016-10-19T14:27:17.000 +0200",
+    "ambienttemp": 31.63,
+    "devicetemp": 37.25,
+    "deviceorientation": 1,
+    "respiratoryrate": 12,
+    "heartrate": 62
+  }]
+}
