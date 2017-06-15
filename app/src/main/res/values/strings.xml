@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2013 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources>
+    <string name="app_name">Cortrium ECG Monitor</string>
+    <string name="company_name">Cortrium</string>
+    <string name="label_device_scan">Device Scan</string>
+    <string name="ble_not_supported">BLE is not supported</string>
+
+    <string name="label_data">Data</string>
+    <string name="label_device_address">Device address</string>
+    <string name="label_state">State</string>
+    <string name="label_device">Device</string>
+    <string name="label_revision">Revision</string>
+    <string name="label_device_bodyposition">Torso</string>
+    <string name="label_sensor_mode">Mode</string>
+    <string name="label_ambient_temperature">Temp</string>
+    <string name="label_object_temperature">Device Temp</string>
+    <string name="label_accelerometer">Accelerometer</string>
+    <string name="label_heart_rate">Heart Rate</string>
+    <string name="label_respiration_rate">Respiration Rate</string>
+    <string name="label_ecg1">ECG-1</string>
+    <string name="label_ecg2">ECG-2</string>
+    <string name="label_ecg3">ECG-3</string>
+    <string name="label_resp"> Resp </string>
+    <string name="label_bpm">bpm</string>
+    <string name="label_celsius">ºC</string>
+    <string name="label_early_warning">Early Warning</string>
+    <string name="label_score">Score</string>
+    <string name="label_na">N/A</string>
+    <string name="label_zero">0</string>
+
+    <string name="no_data">No data</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="title_devices">Device Scan</string>
+    <string name="error_bluetooth_not_supported">Bluetooth 4.0 not supported.</string>
+
+    <string name="unknown_device">Unknown device</string>
+    <string name="unknown_characteristic">Unknown characteristic</string>
+    <string name="unknown_service">Unknown service</string>
+
+    <!-- Menu items -->
+    <string name="menu_connect">Connect</string>
+    <string name="menu_disconnect">Disconnect</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_stop">Stop</string>
+    <string name="title_activity_contrium_c3_ecg">CortriumC3Ecg</string>
+
+    <string name="menu_disconnect_poweroff">Disconnect and power off</string>
+    <string name="menu_disconnect_holter">Disconnect and keep recording</string>
+
+    <string name="symbol_colon">:</string>
+
+    <string name="revision_format">SW:%1$s | FW:%2$s | HW:%3$s</string>
+    <string name="accelerometer_format">X:%1$.04f | Y:%2$.04f | Z%3$.04f</string>
+    <string name="label_battery_level">Battery</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_base">BaseActivity</string>
+</resources>
