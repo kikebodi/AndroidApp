@@ -29,7 +29,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,32 +40,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cortrium.cortriumc3.APIConnection.CortriumAPI;
-import com.cortrium.cortriumc3.APIConnection.ECGRecording;
-import com.cortrium.cortriumc3.APIConnection.ECGRecordingDeserializer;
 import com.cortrium.opkit.ConnectionManager;
 import com.cortrium.opkit.CortriumC3;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
-import okhttp3.Credentials;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.ResponseBody;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
@@ -79,9 +57,6 @@ public class DeviceScanActivity extends ListActivity {
     private ConnectionManager connectionManager;
     private Context mContext = this;
     private String paired_id;
-
-    private CortriumAPI cortriumAPI;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private static final int REQUEST_ENABLE_BT = 1;
 
@@ -172,62 +147,9 @@ public class DeviceScanActivity extends ListActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             askForLocationPermissions();
         }
-
-        createCortriumAPI();
     }
 
-    private void createCortriumAPI() {
-        Gson gson = new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-                .registerTypeAdapter(ECGRecording.class, new ECGRecordingDeserializer())
-                .create();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(CortriumAPI.ENDPOINT)
-                //.client(okHttpClient)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        cortriumAPI = retrofit.create(CortriumAPI.class);
-
-        compositeDisposable.add(cortriumAPI.getRecording("d3cd1bd0-45f8-11e7-bfcf-3f8f418d896b")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(getRecordingObserver()));
-    }
-
-    private DisposableSingleObserver<List<ECGRecording>> getRecordingsObserver() {
-        return new DisposableSingleObserver<List<ECGRecording>>() {
-            @Override
-            public void onSuccess(List<ECGRecording> value) {
-                Log.d(TAG, "onSuccess: "+value.size()+" values");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.d(TAG, "onError");
-                e.printStackTrace();
-                Toast.makeText(DeviceScanActivity.this, "Can not load recordings", Toast.LENGTH_SHORT).show();
-            }
-        };
-    }
-
-    private DisposableSingleObserver<ECGRecording> getRecordingObserver() {
-        return new DisposableSingleObserver<ECGRecording>() {
-
-            @Override
-            public void onSuccess(ECGRecording value) {
-                Log.d(TAG, "onSuccess: "+value.toString());
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.d(TAG, "onError");
-                e.printStackTrace();
-            }
-        };
-    }
 
     @Override
     public void onStart(){
