@@ -35,7 +35,8 @@
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="e138b650a6aa4280c66141991220c00c04edbaa0" />
+            android:value="@string/fabric_key"
+            />
         <!--
  ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
