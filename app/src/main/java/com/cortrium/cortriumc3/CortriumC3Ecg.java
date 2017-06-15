@@ -15,35 +15,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
-import com.cortrium.cortriumc3.APIConnection.CortriumAPI;
-import com.cortrium.cortriumc3.APIConnection.ECGRecordingDeserializer;
 import com.cortrium.opkit.ConnectionManager;
 import com.cortrium.opkit.CortriumC3;
 import com.cortrium.opkit.datapackages.EcgData;
 import com.cortrium.opkit.datatypes.SensorMode;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.io.IOException;
-import java.util.List;
 
 import butterknife.ButterKnife;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
-import okhttp3.Credentials;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import com.cortrium.cortriumc3.APIConnection.*;
 
 public class CortriumC3Ecg extends BaseActivity
 {
