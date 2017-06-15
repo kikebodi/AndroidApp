@@ -9,7 +9,6 @@ Download the ZIP file of this repository or clone it by using the following comm
 ```
 git clone https://github.com/cortrium/AndroidApp.git
 ```
-
 ## How to contribute
 All contributions are appreciated. We encourage to work in your own branch and create a pull request once we make sure everything works fine.
 Here is how:
