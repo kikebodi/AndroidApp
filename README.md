@@ -35,7 +35,7 @@ You can pull code from the original owner's repository by:
 ```
 git pull cortrium master
 ```
-and push the changes to your repo
+and push the changes to your repo with
 ```
 git push
 ```
