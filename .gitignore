@@ -4,6 +4,7 @@
 
 #Allow versions folder
 !version/
+!version/*
 
 #Secret files
 secrets.xml
