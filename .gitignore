@@ -5,6 +5,9 @@
 #Allow versions folder
 !version/
 
+#Secret files
+secrets.xml
+
 # Files for the ART/Dalvik VM
 *.dex
 
