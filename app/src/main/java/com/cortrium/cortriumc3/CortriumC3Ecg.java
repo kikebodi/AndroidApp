@@ -23,8 +23,6 @@ import com.cortrium.opkit.datatypes.SensorMode;
 
 import butterknife.ButterKnife;
 
-import com.cortrium.cortriumc3.test.APIConnection.*;
-
 public class CortriumC3Ecg extends BaseActivity
 {
 	private final static String  TAG   = "CortriumC3Ecg";
