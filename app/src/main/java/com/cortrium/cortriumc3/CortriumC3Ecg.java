@@ -113,6 +113,11 @@ public class CortriumC3Ecg extends BaseActivity
 
 		mDataLogger = new DataLogger(this, mCortriumC3Device);
 
+		/** **/
+
+
+
+
 		setContentView(R.layout.main_layout);
 		ButterKnife.bind(this);
 

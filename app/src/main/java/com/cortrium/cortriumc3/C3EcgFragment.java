@@ -23,6 +23,7 @@ import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
+import com.cortrium.cortriumc3.ApiConnection.models.Recordings;
 import com.cortrium.opkit.CortriumC3;
 import com.cortrium.opkit.Utils;
 import com.cortrium.opkit.datapackages.EcgData;
