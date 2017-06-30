@@ -20,6 +20,7 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,15 +43,15 @@ public class ApiConnectionManager {
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
                 .create();
 
-        OkHttpClient m_client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .build();
+        OkHttpClient.Builder client = new OkHttpClient.Builder();
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        client.addInterceptor(loggingInterceptor);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(con.getResources().getString(R.string.api_url)) // API url is hidden
                 .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(client.build())
                 .build();
 
         this.cortriumAPI = retrofit.create(CortriumAPI.class);
@@ -102,28 +103,23 @@ public class ApiConnectionManager {
     }
 
     private void uploadFile(String id, final File bleFile) {
-        MediaType MEDIA_TYPE_T = MediaType.parse("multipart/form-data");
+        MediaType MEDIA_TYPE = MediaType.parse("multipart/mixed");
+        RequestBody requestBody = RequestBody.create(MEDIA_TYPE,bleFile);
+        MultipartBody.Part partFile = MultipartBody.Part.createFormData("file", bleFile.getName(), requestBody);
+        String recordingId = bleFile.getName().replace(".BLE","");
+        Call<ResponseBody> call = cortriumAPI.uploadRecording(id, recordingId, partFile);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d(TAG+"-Upload "+bleFile.getName(),response.message());
+            }
 
-        if(bleFile != null){
-            RequestBody requestBody = RequestBody.create(MEDIA_TYPE_T,bleFile);
-            MultipartBody.Part partFile = MultipartBody.Part.createFormData("file", bleFile.getName(), requestBody);
-            String recordingId = bleFile.getName().replace(".BLE","");
-            Call<ResponseBody> call = cortriumAPI.uploadRecording(id, recordingId, partFile);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Log.d(TAG+"-Upload "+bleFile.getName(),response.message());
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Log.d(TAG,"FAILED");
-                    t.printStackTrace();
-                }
-            });
-        }else{
-            Log.d(TAG,"BLE was null");
-        }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d(TAG,"FAILED");
+                t.printStackTrace();
+            }
+        });
     }
 
     private void deleteRecording(String recordingId){
