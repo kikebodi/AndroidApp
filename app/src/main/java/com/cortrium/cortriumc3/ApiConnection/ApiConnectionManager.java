@@ -13,7 +13,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -103,11 +105,16 @@ public class ApiConnectionManager {
     }
 
     private void uploadFile(String id, final File bleFile) {
-        MediaType MEDIA_TYPE = MediaType.parse("multipart/mixed");
-        RequestBody requestBody = RequestBody.create(MEDIA_TYPE,bleFile);
-        MultipartBody.Part partFile = MultipartBody.Part.createFormData("file", bleFile.getName(), requestBody);
         String recordingId = bleFile.getName().replace(".BLE","");
-        Call<ResponseBody> call = cortriumAPI.uploadRecording(id, recordingId, partFile);
+        Map<String, RequestBody> files = new HashMap<>();
+        String key = String.format(Locale.US, "file\"; filename=\"%s", bleFile.getName());
+
+        RequestBody requestBody =
+                RequestBody.create(MediaType.parse("multipart/form-data"), bleFile);
+
+        files.put(key, requestBody);
+
+        Call<ResponseBody> call = cortriumAPI.request(id, recordingId, files);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -120,6 +127,7 @@ public class ApiConnectionManager {
                 t.printStackTrace();
             }
         });
+
     }
 
     private void deleteRecording(String recordingId){
