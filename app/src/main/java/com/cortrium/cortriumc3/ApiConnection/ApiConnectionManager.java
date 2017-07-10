@@ -107,7 +107,7 @@ public class ApiConnectionManager {
     private void uploadFile(String id, final File bleFile) {
         String recordingId = bleFile.getName().replace(".BLE","");
         Map<String, RequestBody> files = new HashMap<>();
-        String key = String.format(Locale.US, "file\"; filename=\"%s", bleFile.getName());
+        String key = String.format(Locale.getDefault(), "file\"; filename=\"%s", bleFile.getName());
 
         RequestBody requestBody =
                 RequestBody.create(MediaType.parse("multipart/form-data"), bleFile);
@@ -119,6 +119,13 @@ public class ApiConnectionManager {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Log.d(TAG+"-Upload "+bleFile.getName(),response.message());
+                try {
+                    String info = response.body().string();
+                    Log.d(TAG,info);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             @Override
