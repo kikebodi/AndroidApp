@@ -45,7 +45,6 @@ import com.cortrium.opkit.CortriumC3;
 
 import java.util.ArrayList;
 
-
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
@@ -364,7 +363,6 @@ public class DeviceScanActivity extends ListActivity {
             else
                 viewHolder.deviceName.setText(R.string.unknown_device);
             viewHolder.deviceAddress.setText(device.getAddress());
-
             return view;
         }
     }

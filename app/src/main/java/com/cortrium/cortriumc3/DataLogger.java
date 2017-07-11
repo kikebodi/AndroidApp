@@ -7,6 +7,11 @@ import android.content.IntentFilter;
 import android.util.Log;
 import android.view.View;
 
+import com.cortrium.cortriumc3.ApiConnection.ApiConnectionManager;
+import com.cortrium.cortriumc3.ApiConnection.models.Channels;
+import com.cortrium.cortriumc3.ApiConnection.models.Device;
+import com.cortrium.cortriumc3.ApiConnection.models.Events;
+import com.cortrium.cortriumc3.ApiConnection.models.Recordings;
 import com.cortrium.opkit.ConnectionManager;
 import com.cortrium.opkit.CortriumC3;
 import com.cortrium.opkit.Utils;
@@ -14,13 +19,19 @@ import com.cortrium.opkit.datatypes.Event;
 import com.cortrium.opkit.datatypes.SensorMode;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by hsk on 21/10/16.
@@ -30,12 +41,14 @@ public final class DataLogger {
 
     private final static String TAG = "CortriumC3Comms";
     private final String FOLDER_NAME = "CortriumC3Data";
+    private String recordingFilename;
 
     private RandomAccessFile mBleDataFile;
     private boolean newFile;
     private Context mContext;
     private CortriumC3 mDevice;
     private long currentFilePointer;
+    private long startRecording;
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver()
     {
@@ -62,6 +75,7 @@ public final class DataLogger {
         mDevice = device;
         currentFilePointer = 0;
         newFile = true;
+        startRecording = System.currentTimeMillis();
     }
 
     public void unregisterReceiver(){
@@ -85,6 +99,7 @@ public final class DataLogger {
         else if (sensorMode.getMode() == SensorMode.MODE_ACTIVE || sensorMode.getMode() == SensorMode.MODE_HOLTER)
         {
             String filename = sensorMode.getFileName();
+            recordingFilename = filename;
 
             if (bleFileExists(filename))
             {
@@ -191,6 +206,36 @@ public final class DataLogger {
         return String.format("%s %s", folderNameFormat, mDevice.getName()).replace(' ','-').replace('.','-');
     }
 
+    private File getCurrentRecordingFile(){
+        File bleFile = new File(mContext.getExternalFilesDir(null)+File.separator+FOLDER_NAME+File.separator+folderForFilename(recordingFilename), recordingFilename);
+        File bleFile_copy = new File(mContext.getExternalFilesDir(null)+File.separator+FOLDER_NAME+File.separator+folderForFilename(recordingFilename), recordingFilename.replace(".BLE","")+"_copy.BLE");
+        try {
+            copy(bleFile,bleFile_copy);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bleFile_copy.exists() ? bleFile_copy : null;
+    }
+
+    public void copy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        try {
+            OutputStream out = new FileOutputStream(dst);
+            try {
+                // Transfer bytes from in to out
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+            } finally {
+                out.close();
+            }
+        } finally {
+            in.close();
+        }
+    }
+
     private void closeDataWriters()
     {
         if (mBleDataFile!= null)
@@ -215,10 +260,17 @@ public final class DataLogger {
             @Override
             public void onClick(View v) {
                 List<Event> events = ((CortriumC3Ecg)mContext).main_fragment.getEventList();
-                //TODO: upload somewhere
+                ((CortriumC3Ecg)mContext).main_fragment.fab.hide();
+
+                Channels mChannels = new Channels(true,true,true,true);
+                Device myDevice = new Device(mDevice.getName(),mDevice.getFirmwareRevision(),mDevice.getHardwareRevision(),null,null,null);
+                Integer totalTime = (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()-startRecording);
+                Recordings myRecording = new Recordings(null,recordingFilename, totalTime, myDevice, mChannels, null, null);
+                ApiConnectionManager connector = new ApiConnectionManager(mContext.getResources().getString(R.string.api_url));
+                File bleFile = getCurrentRecordingFile();
+                connector.postRecordingToAPI(myRecording,bleFile);
             }
         };
-
         ((CortriumC3Ecg)mContext).main_fragment.setSnackbar(filename,listener);
     }
 }

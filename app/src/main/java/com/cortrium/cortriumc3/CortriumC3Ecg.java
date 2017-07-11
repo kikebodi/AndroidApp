@@ -114,6 +114,11 @@ public class CortriumC3Ecg extends BaseActivity
 
 		mDataLogger = new DataLogger(this, mCortriumC3Device);
 
+		/** **/
+
+
+
+
 		setContentView(R.layout.main_layout);
 		ButterKnife.bind(this);
 
@@ -212,9 +217,11 @@ public class CortriumC3Ecg extends BaseActivity
 				{
 					case R.id.disconnect_holter:
 						mCortriumC3Device.changeMode(CortriumC3.DeviceModes.DeviceModeDisconnect);
+						finish();
 						break;
 					case R.id.disconnect_poweroff:
 						mCortriumC3Device.changeMode(CortriumC3.DeviceModes.DeviceModeIdle);
+						finish();
 						break;
 				}
 				//Unpair device.
