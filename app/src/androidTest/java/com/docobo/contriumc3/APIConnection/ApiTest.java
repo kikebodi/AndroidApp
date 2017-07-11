@@ -1,6 +1,7 @@
 package com.docobo.contriumc3.APIConnection;
 
 import android.content.Context;
+import android.os.Environment;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
@@ -57,9 +58,6 @@ public class ApiTest {
         String url = InstrumentationRegistry.getTargetContext().getString(R.string.api_url);
         ApiConnectionManager apiManager = new ApiConnectionManager(url);
         apiManager.getRecordingFromAPI(id);
-
-        //signal.await(3, TimeUnit.SECONDS);
-        //Assert.assertTrue(ApiConnectionManager.successfullGetRequest);
     }
 
     @Test
@@ -68,12 +66,13 @@ public class ApiTest {
         String url = InstrumentationRegistry.getTargetContext().getString(R.string.api_url);
         ApiConnectionManager connector = new ApiConnectionManager(url);
 
-        File mFile = createFile(recordingName);
-        Recordings recording = createRecording(recordingName);
+        File mFile = getFile();
+        Recordings recording = createRecording(mFile.getName());
         connector.postRecordingToAPI(recording,mFile);
 
         signal.await(10, TimeUnit.SECONDS);
         Assert.assertTrue(ApiConnectionManager.successfullPostRequest);
+        Assert.assertTrue(ApiConnectionManager.successfullUploadRequest);
     }
 
     @Test
@@ -83,6 +82,7 @@ public class ApiTest {
         connector.deleteRecording(ApiConnectionManager.lastRecordingId);
         //connector.deleteRecording("0a9dc650-6584-11e7-8c8c-d5743dc97a59");
         signal.await(3, TimeUnit.SECONDS);
+        //It always return true so we need to do a GET request to check it.
         testGET(ApiConnectionManager.lastRecordingId);
         signal.await(3, TimeUnit.SECONDS);
         Assert.assertTrue(!ApiConnectionManager.successfullGetRequest);
@@ -96,24 +96,9 @@ public class ApiTest {
         return myRecording;
     }
 
-    private File createFile(String filename){
-
-        File file = new File(instrumentationContext.getExternalFilesDir(null), filename);
-        String path = instrumentationContext.getExternalFilesDir(null)+"/"+filename;
-        try {
-            FileOutputStream outputStream = instrumentationContext.openFileOutput(filename, Context.MODE_PRIVATE);
-            outputStream.write("hjghjghghg".getBytes());
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return file;
+    public File getFile(){
+        //Change for a file in your phone. Check also the path
+        File bleFile = new File(InstrumentationRegistry.getTargetContext().getExternalFilesDir(null),"CortriumC3Data/2017-05-19-12-36-24-C3-849C7913F5D4/591EE6C8.BLE");
+        return bleFile;
     }
 }
