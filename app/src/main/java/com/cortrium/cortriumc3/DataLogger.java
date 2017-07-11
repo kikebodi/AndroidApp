@@ -260,7 +260,8 @@ public final class DataLogger {
             @Override
             public void onClick(View v) {
                 List<Event> events = ((CortriumC3Ecg)mContext).main_fragment.getEventList();
-                //TODO: upload somewhere
+                ((CortriumC3Ecg)mContext).main_fragment.fab.hide();
+
                 Channels mChannels = new Channels(true,true,true,true);
                 Device myDevice = new Device(mDevice.getName(),mDevice.getFirmwareRevision(),mDevice.getHardwareRevision(),null,null,null);
                 Integer totalTime = (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()-startRecording);
