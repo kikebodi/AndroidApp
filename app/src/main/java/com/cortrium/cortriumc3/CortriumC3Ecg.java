@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
+
 import com.cortrium.opkit.ConnectionManager;
 import com.cortrium.opkit.CortriumC3;
 import com.cortrium.opkit.datapackages.EcgData;

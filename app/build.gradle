@@ -10,7 +10,8 @@ buildscript {
     }
 }
 apply plugin: 'com.android.application'
-//pply plugin: 'io.fabric'
+//apply plugin: 'io.fabric'
+
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
