@@ -18,7 +18,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -39,8 +38,15 @@ public class ApiConnectionManager {
 
     private static final String TAG = "API-Conn";
     private final CortriumAPI cortriumAPI;
+    //Test driven variables
+    public static boolean successfullGetRequest  = false;
+    public static boolean successfullPostRequest  = false;
+    public static boolean successfullDeleteRequest = false;
+    public static boolean successfullUploadRequest  = false;
+    public static String lastRecordingId;
 
-    public ApiConnectionManager(Context con){
+
+    public ApiConnectionManager(String api_url){
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
                 .create();
@@ -51,7 +57,7 @@ public class ApiConnectionManager {
         client.addInterceptor(loggingInterceptor);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(con.getResources().getString(R.string.api_url)) // API url is hidden
+                .baseUrl(api_url)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(client.build())
                 .build();
@@ -65,7 +71,10 @@ public class ApiConnectionManager {
             @Override
             public void onResponse(Call<Recordings> call, Response<Recordings> response) {
                 Log.d(TAG,"onSuccess");
+                successfullGetRequest = true;
                 int statusCode = response.code();
+                successfullGetRequest = (statusCode == 200);
+
                 // Use "recording" as you want
                 Recordings recording = response.body();
             }
@@ -73,6 +82,7 @@ public class ApiConnectionManager {
             @Override
             public void onFailure(Call<Recordings> call, Throwable t) {
                 Log.d(TAG,"onFailure GET");
+                successfullGetRequest = false;
                 t.printStackTrace();
             }
         });
@@ -84,11 +94,13 @@ public class ApiConnectionManager {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Log.d(TAG+"-Create",response.message());
+                successfullPostRequest = true;
                 try {
                     String responseBody = response.body().string();
                     JSONObject jObj = new JSONObject(responseBody);
-                    String id = jObj.getString("id");
-                    uploadFile(id, bleFile);
+                    lastRecordingId = jObj.getString("id");
+                    //lastRecordingId = id;
+                    uploadFile(lastRecordingId, bleFile);
 
                 } catch (IOException e) { e.printStackTrace();
                 } catch (JSONException e) { e.printStackTrace();
@@ -99,12 +111,13 @@ public class ApiConnectionManager {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.d(TAG,"onFailure POST");
+                successfullPostRequest = false;
                 t.printStackTrace();
             }
         });
     }
 
-    private void uploadFile(String id, final File bleFile) {
+    public void uploadFile(String id, final File bleFile) {
         String recordingId = bleFile.getName().replace(".BLE","");
         Map<String, RequestBody> files = new HashMap<>();
         String key = String.format(Locale.getDefault(), "file\"; filename=\"%s", bleFile.getName());
@@ -119,35 +132,42 @@ public class ApiConnectionManager {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Log.d(TAG+"-Upload "+bleFile.getName(),response.message());
+                successfullUploadRequest = true;
                 try {
-                    String info = response.body().string();
-                    Log.d(TAG,info);
+                    String responseBody = response.body().string();
+                    JSONObject jObj = new JSONObject(responseBody);
+                    String id = jObj.getString("id");
+                    Log.d(TAG,id);
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.d(TAG,"FAILED");
+                successfullUploadRequest = false;
                 t.printStackTrace();
             }
         });
 
     }
 
-    private void deleteRecording(String recordingId){
+    public void deleteRecording(String recordingId){
         Call<ResponseBody> call = cortriumAPI.deleteRecording(recordingId);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Log.d(TAG+" delete", "onResponse");
+                successfullDeleteRequest = (response.code() == 200);
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.d(TAG+" delete", "onFailure");
+                successfullDeleteRequest = false;
                 t.printStackTrace();
             }
         });

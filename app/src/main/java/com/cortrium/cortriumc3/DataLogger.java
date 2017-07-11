@@ -233,10 +233,9 @@ public final class DataLogger {
                 //TODO: upload somewhere
                 Channels mChannels = new Channels(true,true,true,true);
                 Device myDevice = new Device(mDevice.getName(),mDevice.getFirmwareRevision(),mDevice.getHardwareRevision(),null,null,null);
-                // 0 ->> duration
                 Integer totalTime = (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()-startRecording);
                 Recordings myRecording = new Recordings(null,recordingFilename, totalTime, myDevice, mChannels, null, null);
-                ApiConnectionManager connector = new ApiConnectionManager(mContext);
+                ApiConnectionManager connector = new ApiConnectionManager(mContext.getResources().getString(R.string.api_url));
                 File bleFile = getCurrentRecordingFile();
                 connector.postRecordingToAPI(myRecording,bleFile);
             }

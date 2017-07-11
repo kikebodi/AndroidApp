@@ -46,7 +46,6 @@ public interface CortriumAPI {
     Call<ResponseBody> uploadRecording(@Path("id") String id, @Path("rec_id") String rec_id, @Part MultipartBody.Part bleFile);
 
     @Multipart
-    @Headers("Accept:application/json")
     @POST("recordings/{id}/{rec_id}/")
     Call<ResponseBody> request(
             @Path("id") String id,
