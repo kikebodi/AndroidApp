@@ -118,9 +118,9 @@ public class ApiConnectionManager {
     }
 
     public void uploadFile(String id, final File bleFile) {
-        String recordingId = bleFile.getName().replace(".BLE","");
+        String recordingId = bleFile.getName().replace("_copy.BLE","");
         Map<String, RequestBody> files = new HashMap<>();
-        String key = String.format(Locale.getDefault(), "file\"; filename=\"%s", bleFile.getName());
+        String key = String.format(Locale.getDefault(), "file\"; filename=\"%s", bleFile.getName().replace("_copy.BLE",".BLE"));
 
         RequestBody requestBody =
                 RequestBody.create(MediaType.parse("multipart/form-data"), bleFile);
@@ -133,16 +133,6 @@ public class ApiConnectionManager {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Log.d(TAG+"-Upload "+bleFile.getName(),response.message());
                 successfullUploadRequest = true;
-                try {
-                    String responseBody = response.body().string();
-                    JSONObject jObj = new JSONObject(responseBody);
-                    String id = jObj.getString("id");
-                    Log.d(TAG,id);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             }
 
             @Override
