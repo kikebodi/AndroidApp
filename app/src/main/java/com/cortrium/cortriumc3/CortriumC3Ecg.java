@@ -1,5 +1,7 @@
 package com.cortrium.cortriumc3;
 
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,8 +10,9 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,8 +31,6 @@ public class CortriumC3Ecg extends BaseActivity
 {
 	private final static String  TAG   = "CortriumC3Ecg";
 	private              boolean DEBUG = BuildConfig.DEBUG;
-
-	private EventBroadcastReceiver eventReceiver;
 
 	// Handles various events fired by the Service.
 	// ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -78,7 +79,7 @@ public class CortriumC3Ecg extends BaseActivity
 			{
 				case MSG_CLEAR_UI:
 				{
-					main_fragment.clearUI();
+					getMainFragment().clearUI();
 					break;
 				}
 				case MSG_UPDATE_CONNECTION_STATE:
@@ -92,9 +93,24 @@ public class CortriumC3Ecg extends BaseActivity
 
 	private CortriumC3 mCortriumC3Device;
 	private ConnectionManager mConnectionManager;
-	public C3EcgFragment main_fragment;
 	private DataLogger mDataLogger;
-	/*private Event mEvent;*/
+
+	// The ViewPager is responsible for sliding pages (fragments) in and out upon user input
+	private ViewPager mViewPager;
+
+	private EventBroadcastReceiver eventReceiver;
+
+	// Titles of the individual pages (displayed in tabs)
+	private final String[] PAGE_TITLES = new String[] {
+			"Graph",
+			"Page 2"
+	};
+
+	// The fragments that are used as the individual pages
+	private final Fragment[] PAGES = new Fragment[] {
+			new C3EcgFragment(),
+			new Page2Fragment()
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -114,19 +130,31 @@ public class CortriumC3Ecg extends BaseActivity
 
 		mDataLogger = new DataLogger(this, mCortriumC3Device);
 
-		/** **/
-
-
-
-
-		setContentView(R.layout.main_layout);
+		//setContentView(R.layout.main_layout);
+		setContentView(R.layout.activity_main);
 		ButterKnife.bind(this);
 
-		FragmentManager fragmentManager = getSupportFragmentManager();
+		// Set the Toolbar as the activity's app bar (instead of the default ActionBar)
+		/*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);*/
+
+		// Connect the ViewPager to our custom PagerAdapter. The PagerAdapter supplies the pages
+		// (fragments) to the ViewPager, which the ViewPager needs to display.
+		mViewPager = (ViewPager) findViewById(R.id.viewpager);
+		mViewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
+
+		// Connect the tabs with the ViewPager (the setupWithViewPager method does this for us in
+		// both directions, i.e. when a new tab is selected, the ViewPager switches to this page,
+		// and when the ViewPager switches to a new page, the corresponding tab is selected)
+		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+		tabLayout.setupWithViewPager(mViewPager);
+		/** **/
+
+		/*FragmentManager fragmentManager = getSupportFragmentManager();
 		FragmentTransaction fragmentTransaction =fragmentManager.beginTransaction();
 		main_fragment  = new C3EcgFragment();
 		fragmentTransaction.replace(R.id.your_placeholder, main_fragment);
-		fragmentTransaction.commit();
+		fragmentTransaction.commit();*/
 	}
 
 	@Override
@@ -163,6 +191,10 @@ public class CortriumC3Ecg extends BaseActivity
 		if (mConnectionManager.getConnectionState() != ConnectionManager.ConnectionStates.Connected){
 			super.onBackPressed();
 		}
+	}
+
+	public C3EcgFragment getMainFragment(){
+		return (C3EcgFragment) PAGES[0];
 	}
 
 	@Override
@@ -276,7 +308,7 @@ public class CortriumC3Ecg extends BaseActivity
 		if (!ecgData.isFillerSamples()){
 			mDataLogger.logBlePayload(ecgData.getRawBlePayload(), ecgData.getMiscInfo().getSerial());
 		}
-		main_fragment.onEcgDataUpdated(ecgData);
+		getMainFragment().onEcgDataUpdated(ecgData);
 	}
 
 	private final ConnectionManager.EcgDataListener mListener = new ConnectionManager.EcgDataListener() {
@@ -310,4 +342,28 @@ public class CortriumC3Ecg extends BaseActivity
 			});
 		}
 	};
+
+	/* PagerAdapter for supplying the ViewPager with the pages (fragments) to display. */
+	public class MyPagerAdapter extends FragmentPagerAdapter {
+
+		public MyPagerAdapter(FragmentManager fragmentManager) {
+			super(fragmentManager);
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			return PAGES[position];
+		}
+
+		@Override
+		public int getCount() {
+			return PAGES.length;
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position) {
+			return PAGE_TITLES[position];
+		}
+
+	}
 }
