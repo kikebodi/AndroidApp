@@ -36,6 +36,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
 import butterknife.Unbinder;
 
 /**
@@ -73,16 +74,15 @@ public class C3EcgFragment extends Fragment {
 
         if(mySnackbar == null) return;
 
-
         if(shownTools){
-            mySnackbar.dismiss();
-            fab.hide();
-            shownTools = false;
+            hideTools();
         }else{
-            mySnackbar.show();
-            fab.show();
-            shownTools = true;
+            showTools();
         }
+    }
+
+    @OnFocusChange(R.id.main_layout_fragment) void loseFocus(){
+        Log.d(TAG,"Change focus");
     }
 
     @OnClick(R.id.floatingActionButton) void addEvent(){
@@ -284,6 +284,20 @@ public class C3EcgFragment extends Fragment {
                 ecgSeries.addLast(null, null);
             }
         }
+    }
+
+    public void hideTools(){
+        if(mySnackbar != null){
+            mySnackbar.dismiss();
+        }
+        fab.hide();
+        shownTools = false;
+    }
+
+    public void showTools(){
+        mySnackbar.show();
+        fab.show();
+        shownTools = true;
     }
 
     public void setSnackbar(String filename, View.OnClickListener listener) {

@@ -102,8 +102,8 @@ public class CortriumC3Ecg extends BaseActivity
 
 	// Titles of the individual pages (displayed in tabs)
 	private final String[] PAGE_TITLES = new String[] {
-			"Graph",
-			"Page 2"
+			"ECG",
+			"Recordings"
 	};
 
 	// The fragments that are used as the individual pages
@@ -130,31 +130,38 @@ public class CortriumC3Ecg extends BaseActivity
 
 		mDataLogger = new DataLogger(this, mCortriumC3Device);
 
-		//setContentView(R.layout.main_layout);
 		setContentView(R.layout.activity_main);
 		ButterKnife.bind(this);
 
-		// Set the Toolbar as the activity's app bar (instead of the default ActionBar)
-		/*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);*/
 
 		// Connect the ViewPager to our custom PagerAdapter. The PagerAdapter supplies the pages
 		// (fragments) to the ViewPager, which the ViewPager needs to display.
 		mViewPager = (ViewPager) findViewById(R.id.viewpager);
 		mViewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
+		mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+				if(position == 1){
+					getMainFragment().hideTools();
+				}
+			}
+
+			@Override
+			public void onPageSelected(int position) {
+
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state) {
+
+			}
+		});
 
 		// Connect the tabs with the ViewPager (the setupWithViewPager method does this for us in
 		// both directions, i.e. when a new tab is selected, the ViewPager switches to this page,
 		// and when the ViewPager switches to a new page, the corresponding tab is selected)
 		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
 		tabLayout.setupWithViewPager(mViewPager);
-		/** **/
-
-		/*FragmentManager fragmentManager = getSupportFragmentManager();
-		FragmentTransaction fragmentTransaction =fragmentManager.beginTransaction();
-		main_fragment  = new C3EcgFragment();
-		fragmentTransaction.replace(R.id.your_placeholder, main_fragment);
-		fragmentTransaction.commit();*/
 	}
 
 	@Override
