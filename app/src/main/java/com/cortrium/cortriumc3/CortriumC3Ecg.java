@@ -109,7 +109,7 @@ public class CortriumC3Ecg extends BaseActivity
 	// The fragments that are used as the individual pages
 	private final Fragment[] PAGES = new Fragment[] {
 			new C3EcgFragment(),
-			new Page2Fragment()
+			new RecordingsFragment()
 	};
 
 	@Override
