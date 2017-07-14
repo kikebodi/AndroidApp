@@ -9,7 +9,7 @@ import android.view.View;
  * Created by Kike on 18/05/2017.
  */
 
-public class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment {
 
     private final static String TAG = "BaseFragment";
 
@@ -58,5 +58,4 @@ public class BaseFragment extends Fragment {
         super.onDestroy();
         Log.d(TAG,"onDestroy");
     }
-
 }

@@ -1,5 +1,6 @@
 package com.cortrium.cortriumc3;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,6 +23,7 @@ import butterknife.Unbinder;
 public class RecordingsFragment extends Fragment {
 
     @BindView(R.id.recordings_recycler_view) RecyclerView mRecyclerView;
+    @BindView(R.id.floatingActionButtonDisconnect) FloatingActionButton disconnectFab;
     private final String TAG = RecordingsFragment.class.getName();
     private Unbinder unbinder;
     private final String FOLDER_NAME = "CortriumC3Data";
@@ -54,11 +56,29 @@ public class RecordingsFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        //String myDataset[] = {"One", "Two", "Three"};
         files = getRecordingsFromInternalStorage();
 
         mAdapter = new MyAdapter(files, this);
         mRecyclerView.setAdapter(mAdapter);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy > 0 ){
+                    if(disconnectFab.isShown()) disconnectFab.hide();
+                } else {
+                    if(!disconnectFab.isShown()) disconnectFab.show();
+                }
+            }
+        });
+
+        disconnectFab.setOnClickListener(((C3EcgActivity)getActivity()).getFabOnCLickListener());
+
+    }
+
+    public void setFabOnClickListener(OnClickListener listener){
+        disconnectFab.setOnClickListener(listener);
     }
 
     @Override
@@ -80,6 +100,4 @@ public class RecordingsFragment extends Fragment {
         }
         return files;
     }
-
-
 }

@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 
 public class Utils {
 
-    private final static String TAG = "CortriumC3Ecg";
+    private final static String TAG = "Utils";
     private static final String SHARED_PREFERENCES_KEY = TAG;
     private static final String PAIRED_DEVICE = "paired_device_id";
 

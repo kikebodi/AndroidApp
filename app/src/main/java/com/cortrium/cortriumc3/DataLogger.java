@@ -254,13 +254,13 @@ public final class DataLogger {
     }
 
     private void enableUpload(String filename){
-        if(mContext == null || ((CortriumC3Ecg)mContext).getMainFragment() == null) return;
+        if(mContext == null || ((C3EcgActivity)mContext).getMainFragment() == null) return;
 
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Event> events = ((CortriumC3Ecg)mContext).getMainFragment().getEventList();
-                ((CortriumC3Ecg)mContext).getMainFragment().fab.hide();
+                List<Event> events = ((C3EcgActivity)mContext).getMainFragment().getEventList();
+                ((C3EcgActivity)mContext).getMainFragment().fab.hide();
 
                 Channels mChannels = new Channels(true,true,true,true);
                 Device myDevice = new Device(mDevice.getName(),mDevice.getFirmwareRevision(),mDevice.getHardwareRevision(),null,null,null);
@@ -271,6 +271,6 @@ public final class DataLogger {
                 connector.postRecordingToAPI(myRecording,bleFile);
             }
         };
-        ((CortriumC3Ecg)mContext).getMainFragment().setSnackbar(filename,listener);
+        ((C3EcgActivity)mContext).getMainFragment().setSnackbar(filename,listener);
     }
 }

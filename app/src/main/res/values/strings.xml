@@ -70,4 +70,9 @@
     <string name="title_activity_base">BaseActivity</string>
     <string name="label_oximeter">" SpO2 "</string>
     <string name="label_percentage">%</string>
+    <string name="choose_disconnect_mode">Choose disconnect mode:</string>
+    <string-array name="mode">
+        <item>Disconnect and power off</item>
+        <item>Disconnect and keep recording</item>
+    </string-array>
 </resources>

@@ -1,23 +1,27 @@
 package com.cortrium.cortriumc3;
 
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.PopupMenu;
 
 import com.cortrium.opkit.ConnectionManager;
@@ -27,9 +31,8 @@ import com.cortrium.opkit.datatypes.SensorMode;
 
 import butterknife.ButterKnife;
 
-public class CortriumC3Ecg extends BaseActivity
-{
-	private final static String  TAG   = "CortriumC3Ecg";
+public class C3EcgActivity extends BaseActivity{
+	private final static String  TAG   = "C3EcgActivity";
 	private              boolean DEBUG = BuildConfig.DEBUG;
 
 	// Handles various events fired by the Service.
@@ -94,6 +97,7 @@ public class CortriumC3Ecg extends BaseActivity
 	private CortriumC3 mCortriumC3Device;
 	private ConnectionManager mConnectionManager;
 	private DataLogger mDataLogger;
+	private int userSelection;
 
 	// The ViewPager is responsible for sliding pages (fragments) in and out upon user input
 	private ViewPager mViewPager;
@@ -133,7 +137,6 @@ public class CortriumC3Ecg extends BaseActivity
 		setContentView(R.layout.activity_main);
 		ButterKnife.bind(this);
 
-
 		// Connect the ViewPager to our custom PagerAdapter. The PagerAdapter supplies the pages
 		// (fragments) to the ViewPager, which the ViewPager needs to display.
 		mViewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -147,14 +150,10 @@ public class CortriumC3Ecg extends BaseActivity
 			}
 
 			@Override
-			public void onPageSelected(int position) {
-
-			}
+			public void onPageSelected(int position) { }
 
 			@Override
-			public void onPageScrollStateChanged(int state) {
-
-			}
+			public void onPageScrollStateChanged(int state) { }
 		});
 
 		// Connect the tabs with the ViewPager (the setupWithViewPager method does this for us in
@@ -204,48 +203,16 @@ public class CortriumC3Ecg extends BaseActivity
 		return (C3EcgFragment) PAGES[0];
 	}
 
+	public RecordingsFragment getRecordingsFragment(){
+		return (RecordingsFragment) PAGES[1];
+	}
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig){
-
+		//Do nothing on screen rotation. DO NOT REMOVE
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		getMenuInflater().inflate(R.menu.gatt_services, menu);
-		if (mConnectionManager.getConnectionState() == ConnectionManager.ConnectionStates.Connected)
-		{
-			menu.findItem(R.id.menu_connect).setVisible(false);
-			menu.findItem(R.id.menu_disconnect).setVisible(true);
-		}
-		else
-		{
-			menu.findItem(R.id.menu_connect).setVisible(true);
-			menu.findItem(R.id.menu_disconnect).setVisible(false);
-		}
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		switch (item.getItemId())
-		{
-			case R.id.menu_connect:
-				mConnectionManager.connectDevice(mCortriumC3Device);
-				return true;
-			case R.id.menu_disconnect:
-				showPopup(findViewById(R.id.menu_disconnect));
-				return true;
-			case android.R.id.home:
-				onBackPressed();
-				return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	private void showPopup(View v)
-	{
+	private void showPopup(View v){
 		PopupMenu popup = new PopupMenu(this, v);
 		MenuInflater inflater = popup.getMenuInflater();
 		inflater.inflate(R.menu.disconnect_menu, popup.getMenu());
@@ -280,17 +247,6 @@ public class CortriumC3Ecg extends BaseActivity
 
 		return intentFilter;
 	}
-
-	/*private void updateConnectionState()
-	{
-		if (mConnectionManager.getConnectionState() == ConnectionManager.ConnectionStates.Connected)
-		{
-			mConnectionState.setText(R.string.connected);
-		}
-		else {
-			mConnectionState.setText(R.string.disconnected);
-		}
-	}*/
 
 	private void onDeviceInformationUpdated(CortriumC3 device)
 	{
@@ -349,6 +305,71 @@ public class CortriumC3Ecg extends BaseActivity
 			});
 		}
 	};
+
+	public View.OnClickListener getFabOnCLickListener() {
+		return new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+				if (mConnectionManager.getConnectionState() == ConnectionManager.ConnectionStates.Connected){
+					//showPopup(findViewById(R.id.menu_disconnect));
+					showDisconnectPopup();
+				}else{
+					mConnectionManager.connectDevice(mCortriumC3Device);
+				}
+			}
+		};
+	}
+
+	//https://stackoverflow.com/questions/15762905/how-can-i-display-a-list-view-in-an-android-alert-dialog
+	private void showDisconnectPopup() {
+		// setup the alert builder
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.choose_disconnect_mode));
+
+		// add a radio button list
+		//String[] animals = {"horse", "cow", "camel", "sheep", "goat"};
+		String[] modes = getResources().getStringArray(R.array.mode);
+
+		int checkedItem = 0; // disconnect and power off
+		builder.setSingleChoiceItems(modes, checkedItem, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// user checked an item
+				Log.e(TAG,which+"");
+				userSelection = which;
+			}
+		});
+
+		//https://stackoverflow.com/questions/36297110/dialoginterface-onclicklistener-listener-variable-cannot-be-resolved-java
+		// add OK and Cancel buttons
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, final int which) {
+				// user clicked OK
+				switch (userSelection){
+					case 0:
+						mCortriumC3Device.changeMode(CortriumC3.DeviceModes.DeviceModeIdle);
+						finish();
+						break;
+					case 1:
+						mCortriumC3Device.changeMode(CortriumC3.DeviceModes.DeviceModeDisconnect);
+						finish();
+						break;
+					default:
+						Log.e(TAG,"This shouldn't happen. Which: "+which);
+				}
+			}
+		});
+
+
+		builder.setNegativeButton("Cancel", null);
+
+		// create and show the alert dialog
+		AlertDialog dialog = builder.create();
+		dialog.show();
+	}
+
 
 	/* PagerAdapter for supplying the ViewPager with the pages (fragments) to display. */
 	public class MyPagerAdapter extends FragmentPagerAdapter {

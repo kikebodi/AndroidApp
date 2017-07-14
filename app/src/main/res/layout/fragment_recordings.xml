@@ -10,26 +10,26 @@
     <!-- A RecyclerView with some commonly used attributes -->
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton3"
+        android:id="@+id/floatingActionButtonDisconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:clickable="true"
+        android:tint="@color/cortrium_secondary_white"
+        app:backgroundTint="@color/cortrium_primary_dark"
         app:elevation="8dp"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="@+id/recordings_recycler_view"
         app:layout_constraintRight_toRightOf="@+id/recordings_recycler_view"
-        app:srcCompat="@drawable/common_full_open_on_phone" />
+        app:srcCompat="@android:drawable/ic_lock_power_off" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recordings_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
         android:scrollbars="vertical"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -50,7 +50,7 @@ import java.util.ArrayList;
  */
 public class DeviceScanActivity extends ListActivity {
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    private final static String TAG = "CortriumC3Ecg";
+    private final static String TAG = "C3EcgActivity";
 
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private ConnectionManager connectionManager;
@@ -278,7 +278,7 @@ public class DeviceScanActivity extends ListActivity {
     private void connectToDevice(CortriumC3 device){
         connectionManager.connectDevice(device);
 
-        Intent intent = new Intent(mContext, CortriumC3Ecg.class);
+        Intent intent = new Intent(mContext, C3EcgActivity.class);
         startActivity(intent);
     }
 

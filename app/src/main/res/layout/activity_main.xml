@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.cortrium.cortriumc3.CortriumC3Ecg">
+    tools:context="com.cortrium.cortriumc3.C3EcgActivity">
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tab_layout"

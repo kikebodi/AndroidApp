@@ -48,7 +48,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * Inner class for BroadcastReceiver. It's used in CortriumC3Ecg but not implemented yet.
+     * Inner class for BroadcastReceiver. It's used in C3EcgActivity but not implemented yet.
      * We keep it here as security.
      */
     public static final class EventBroadcastReceiver extends BroadcastReceiver {
