@@ -1,5 +1,6 @@
 package com.cortrium.cortriumc3;
 
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -10,10 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,13 +30,30 @@ public class RecordingsFragment extends Fragment {
     private final String FOLDER_NAME = "CortriumC3Data";
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private File[] files;
+    private List<File> files;
     private OnClickListener listener = new OnClickListener() {
         @Override
         public void onClick(final View view) {
             int itemPosition = mRecyclerView.getChildLayoutPosition(view);
-            //String item = mList.get(itemPosition);
+            int id = view.getId();
             Log.d(TAG,itemPosition+"");
+        }
+    };
+    private OnClickListener deleteListener = new OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            int itemPosition = mRecyclerView.getChildLayoutPosition(view);
+            File fileToDelete = files.get(itemPosition).getParentFile();
+            if(deleteRecursive(fileToDelete)){
+                //https://stackoverflow.com/questions/31367599/how-to-update-recyclerview-adapter-data
+                files.remove(itemPosition);
+                mLayoutManager.removeViewAt(itemPosition);
+                mAdapter.notifyItemRemoved(itemPosition);
+                mAdapter.notifyItemRangeChanged(itemPosition,files.size());
+                Log.d(TAG,"Successfully deleted");
+            }else{
+                Log.d(TAG,"Error deleting file");
+            }
         }
     };
 
@@ -91,13 +109,42 @@ public class RecordingsFragment extends Fragment {
         return listener;
     }
 
-    public File[] getRecordingsFromInternalStorage(){
+    public OnClickListener getOnDeleteClickListener(){
+        return deleteListener;
+    }
+
+    public List<File> getRecordingsFromInternalStorage(){
         File mainDirectory = new File(getContext().getExternalFilesDir(null)+File.separator+FOLDER_NAME);
         File[] directories = mainDirectory.listFiles();
-        File[] files = new File[directories.length];
+        //File[] files = new File[directories.length];
+        List<File> files = new ArrayList<>();
         for(int i=0;i<directories.length;i++){
-            files[i] = directories[i].listFiles()[0];
+            files.add(directories[i].listFiles()[0]);
         }
         return files;
+    }
+
+    public void deleteFile(int position){
+        File fileToDelete = files.get(position).getParentFile();
+        if(deleteRecursive(fileToDelete)){
+            //https://stackoverflow.com/questions/31367599/how-to-update-recyclerview-adapter-data
+            files.remove(position);
+            mLayoutManager.removeViewAt(position);
+            mAdapter.notifyItemRemoved(position);
+            mAdapter.notifyItemRangeChanged(position,files.size());
+            Log.d(TAG,"Successfully deleted");
+        }else{
+            Log.d(TAG,"Error deleting file");
+        }
+    }
+
+    //https://stackoverflow.com/questions/13410949/how-to-delete-folder-from-internal-storage-in-android
+    public boolean deleteRecursive(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory()) {
+            for (File child : fileOrDirectory.listFiles()) {
+                deleteRecursive(child);
+            }
+        }
+        return fileOrDirectory.delete();
     }
 }

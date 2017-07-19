@@ -341,7 +341,6 @@ public class C3EcgActivity extends BaseActivity{
 			}
 		});
 
-		//https://stackoverflow.com/questions/36297110/dialoginterface-onclicklistener-listener-variable-cannot-be-resolved-java
 		// add OK and Cancel buttons
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			@Override

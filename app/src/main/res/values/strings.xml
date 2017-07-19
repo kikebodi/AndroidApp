@@ -30,9 +30,9 @@
     <string name="label_accelerometer">Accelerometer</string>
     <string name="label_heart_rate">Heart Rate</string>
     <string name="label_respiration_rate">Respiration Rate</string>
-    <string name="label_ecg1">ECG-1</string>
-    <string name="label_ecg2">ECG-2</string>
-    <string name="label_ecg3">ECG-3</string>
+    <string name="label_ecg1">ECG-I</string>
+    <string name="label_ecg2">ECG-II</string>
+    <string name="label_ecg3">ECG-III</string>
     <string name="label_resp"> Resp </string>
     <string name="label_bpm">bpm</string>
     <string name="label_celsius">ºC</string>

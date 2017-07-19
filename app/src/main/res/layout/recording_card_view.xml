@@ -10,7 +10,7 @@
     android:background="@drawable/card_style">
     <!-- A CardView that contains a TextView -->
     <ImageButton
-        android:id="@+id/imageButton4"
+        android:id="@+id/uploadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -19,13 +19,13 @@
         android:background="@android:color/transparent"
         android:tint="@color/cortrium_secondary_black"
         card_view:layout_constraintBottom_toBottomOf="parent"
-        card_view:layout_constraintRight_toLeftOf="@+id/imageButton3"
+        card_view:layout_constraintRight_toLeftOf="@+id/deleteButton"
         card_view:layout_constraintTop_toTopOf="parent"
         card_view:srcCompat="@android:drawable/ic_menu_upload"
         android:layout_marginEnd="8dp" />
 
     <ImageButton
-        android:id="@+id/imageButton3"
+        android:id="@+id/deleteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -50,21 +50,11 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:text="File.BLE"
         android:textSize="18sp"
-        card_view:layout_constraintBottom_toBottomOf="@+id/folder"
         card_view:layout_constraintLeft_toLeftOf="parent"
-        card_view:layout_constraintRight_toLeftOf="@+id/imageButton4"
-        card_view:layout_constraintTop_toTopOf="@+id/folder"
-        card_view:layout_constraintVertical_bias="0.514" />
-
-    <TextView
-        android:id="@+id/folder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Folder"
-        android:textSize="18sp"
-        card_view:layout_constraintBottom_toBottomOf="parent"
+        card_view:layout_constraintRight_toLeftOf="@+id/uploadButton"
         card_view:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="60dp" />
+        android:layout_marginTop="8dp"
+        card_view:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp" />
 </android.support.constraint.ConstraintLayout>
