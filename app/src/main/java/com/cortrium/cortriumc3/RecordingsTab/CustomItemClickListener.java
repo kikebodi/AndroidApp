@@ -1,4 +1,4 @@
-package com.cortrium.cortriumc3;
+package com.cortrium.cortriumc3.RecordingsTab;
 
 import android.view.View;
 
@@ -9,5 +9,6 @@ import android.view.View;
  */
 
 public interface CustomItemClickListener{
-    public void onItemClick(View v, int position);
+    public void deleteItem(int pos);
+    public void uploadItem(int pos);
 }

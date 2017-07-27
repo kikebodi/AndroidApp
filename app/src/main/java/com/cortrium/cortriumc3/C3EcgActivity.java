@@ -16,14 +16,12 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.PopupMenu;
 
+import com.cortrium.cortriumc3.RecordingsTab.RecordingsFragment;
 import com.cortrium.opkit.ConnectionManager;
 import com.cortrium.opkit.CortriumC3;
 import com.cortrium.opkit.datapackages.EcgData;

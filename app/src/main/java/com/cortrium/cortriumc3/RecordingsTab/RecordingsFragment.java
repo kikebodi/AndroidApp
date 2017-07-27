@@ -1,6 +1,5 @@
-package com.cortrium.cortriumc3;
+package com.cortrium.cortriumc3.RecordingsTab;
 
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -11,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+
+import com.cortrium.cortriumc3.C3EcgActivity;
+import com.cortrium.cortriumc3.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -76,7 +78,18 @@ public class RecordingsFragment extends Fragment {
         // specify an adapter (see also next example)
         files = getRecordingsFromInternalStorage();
 
-        mAdapter = new MyAdapter(files, this);
+        mAdapter = new MyAdapter(files, this, new CustomItemClickListener() {
+            @Override
+            public void deleteItem(int pos) {
+                Log.d(TAG, "delete "+pos);
+                deleteFile(pos);
+            }
+
+            @Override
+            public void uploadItem(int pos) {
+                Log.d(TAG, "upload "+pos);
+            }
+        });
         mRecyclerView.setAdapter(mAdapter);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
