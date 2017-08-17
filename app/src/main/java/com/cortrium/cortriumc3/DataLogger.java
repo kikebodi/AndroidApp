@@ -8,14 +8,11 @@ import android.util.Log;
 import android.view.View;
 
 import com.cortrium.cortriumc3.ApiConnection.ApiConnectionManager;
-import com.cortrium.cortriumc3.ApiConnection.models.Channels;
-import com.cortrium.cortriumc3.ApiConnection.models.Device;
 import com.cortrium.cortriumc3.ApiConnection.models.Events;
 import com.cortrium.cortriumc3.ApiConnection.models.Recordings;
 import com.cortrium.opkit.ConnectionManager;
 import com.cortrium.opkit.CortriumC3;
 import com.cortrium.opkit.Utils;
-import com.cortrium.opkit.datatypes.Event;
 import com.cortrium.opkit.datatypes.SensorMode;
 
 import java.io.File;
@@ -26,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -33,8 +31,11 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import static com.cortrium.cortriumc3.Utils.generateRecordings;
+
 /**
  * Created by hsk on 21/10/16.
+ *
  */
 
 public final class DataLogger {
@@ -130,10 +131,10 @@ public final class DataLogger {
                     if (fileWriteLocation > currentFilePointer + bufferSize) {
                         // With new files we have to fill the gap from serial 0 -> serial * bufferSize with 0's
                         byte[] bytes = new byte[(int)(fileWriteLocation - currentFilePointer)];
+                        mBleDataFile.write(getHeaders());
                         mBleDataFile.write(bytes);
                     }
-                }
-                else {
+                } else {
                     long fileSize = mBleDataFile.length();
                     if (fileSize < fileWriteLocation) {
                         // With existing files we have to fill the gap from mBleDataFile.length -> serial * bufferSize with 0's
@@ -142,14 +143,24 @@ public final class DataLogger {
                     }
                 }
 
+
+                //TODO: Add full headers if it's not done yet
+                /*if (!allHeadersWritten && mDevice.isDeviceInformationComplete()) {
+                    long pos = mBleDataFile.getFilePointer();
+                    mBleDataFile.seek(0);
+                    long pos2 = mBleDataFile.getFilePointer();
+                    mBleDataFile.write(getHeaders());
+                    long pos3 = mBleDataFile.getFilePointer();
+                    mBleDataFile.seek(pos);
+                }*/
+
                 //Log.v(TAG, String.format("Writing serial %d at offset %d", serial, serial * bufferSize));
                 mBleDataFile.seek(serial * bufferSize);
                 mBleDataFile.write(rawBlePayload.array());
 
                 currentFilePointer = mBleDataFile.getFilePointer();
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Log.e(TAG, String.format("Error seekting to specific offset: %d", serial), ex);
             }
         }
@@ -197,6 +208,50 @@ public final class DataLogger {
         {
             Log.e(TAG, "Failed to create file dump streams", e);
         }
+    }
+
+    /**
+     * V_01
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    private byte[] getHeaders() throws UnsupportedEncodingException {
+        byte[] header = new byte[48];
+        byte[] constant = new byte[7];
+        byte[] fileFormatVersion = new byte[3];
+        byte[] deviceID = new byte[16];
+        byte[] firmwareVersion = new byte[13];
+        byte[] hardwareVersion = new byte[8];
+        //byte[] recordingLenght = new byte[4];
+        byte[] mode = new byte[1];
+
+
+        constant = "BLE-C3".getBytes();
+        writeOnHeader(constant, header, 0);
+        fileFormatVersion = "02".getBytes();
+        writeOnHeader(fileFormatVersion, header, 7);
+        //TODO CortriumC3 object doesn't retrieve this (https://trello.com/c/ItF16ACM/36-cortriumc3-object-doesnt-retrieve-hardware-software-or-firmware-revision)
+        if(mDevice.getDeviceSerial() != null){
+            deviceID = mDevice.getDeviceSerial().getBytes();
+            writeOnHeader(deviceID, header, 10);
+        }
+        if(mDevice.getFirmwareRevision() != null){
+            firmwareVersion = mDevice.getFirmwareRevision().getBytes();
+            writeOnHeader(firmwareVersion, header, 26);
+        }
+        if(mDevice.getFirmwareRevision() != null){
+            hardwareVersion = mDevice.getHardwareRevision().getBytes();
+            writeOnHeader(hardwareVersion, header, 39);
+        }
+
+        mode[0] = 0;
+        writeOnHeader(mode, header, 47);
+
+        return header;
+    }
+
+    private void writeOnHeader(byte[] src, byte[] dest, int pos){
+        System.arraycopy(src, 0, dest, pos, src.length);
     }
 
     private String folderForFilename(String filename) {
@@ -259,13 +314,13 @@ public final class DataLogger {
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Event> events = ((C3EcgActivity)mContext).getMainFragment().getEventList();
+                List<Events> events = ((C3EcgActivity)mContext).getMainFragment().getEventList();
                 ((C3EcgActivity)mContext).getMainFragment().fab.hide();
 
-                Channels mChannels = new Channels(true,true,true,true);
-                Device myDevice = new Device(mDevice.getName(),mDevice.getFirmwareRevision(),mDevice.getHardwareRevision(),null,null,null);
+
+
                 Integer totalTime = (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()-startRecording);
-                Recordings myRecording = new Recordings(null,recordingFilename, totalTime, myDevice, mChannels, null, null);
+                Recordings myRecording = generateRecordings(mDevice.getName(),mDevice.getFirmwareRevision(),mDevice.getHardwareRevision(),recordingFilename,totalTime);
                 ApiConnectionManager connector = new ApiConnectionManager(mContext.getResources().getString(R.string.api_url));
                 File bleFile = getCurrentRecordingFile();
                 connector.postRecordingToAPI(myRecording,bleFile);

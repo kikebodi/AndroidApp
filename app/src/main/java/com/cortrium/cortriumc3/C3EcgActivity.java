@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -24,7 +25,9 @@ import android.widget.PopupMenu;
 import com.cortrium.cortriumc3.RecordingsTab.RecordingsFragment;
 import com.cortrium.opkit.ConnectionManager;
 import com.cortrium.opkit.CortriumC3;
+import com.cortrium.opkit.StaticToast;
 import com.cortrium.opkit.datapackages.EcgData;
+import com.cortrium.opkit.datapackages.SpO2Data;
 import com.cortrium.opkit.datatypes.SensorMode;
 
 import butterknife.ButterKnife;
@@ -32,6 +35,8 @@ import butterknife.ButterKnife;
 public class C3EcgActivity extends BaseActivity{
 	private final static String  TAG   = "C3EcgActivity";
 	private              boolean DEBUG = BuildConfig.DEBUG;
+
+	private boolean spo2UpdateAllowed = true;
 
 	// Handles various events fired by the Service.
 	// ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -272,6 +277,12 @@ public class C3EcgActivity extends BaseActivity{
 		getMainFragment().onEcgDataUpdated(ecgData);
 	}
 
+	private void onSpO2DataUpdated(SpO2Data spO2Data)
+	{
+		//TODO: Log data (We keep the logger here). To be done in the future. Look method above
+		getMainFragment().onSpO2DataUploaded(spO2Data);
+	}
+
 	private final ConnectionManager.EcgDataListener mListener = new ConnectionManager.EcgDataListener() {
 		@Override
 		public void ecgDataUpdated(final EcgData ecgData) {
@@ -281,6 +292,30 @@ public class C3EcgActivity extends BaseActivity{
 					onEcgDataUpdated(ecgData);
 				}
 			});
+		}
+
+		//Calculate SpO2 result take a lot of computational time.
+		//For this reason, we only calculate it once each sec.
+		@Override
+		public void spo2DataUploaded(final SpO2Data spO2Data) {
+			Handler mHandler = new Handler(Looper.getMainLooper());
+			if(spo2UpdateAllowed) {
+				// Modify spo2UpdateAllowed to false for 1000ms
+				spo2UpdateAllowed = false;
+				mHandler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						spo2UpdateAllowed = true;
+					}
+				},1000);
+				//update UI Thread
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						onSpO2DataUpdated(spO2Data);
+					}
+				});
+			}
 		}
 
 		@Override
@@ -356,6 +391,8 @@ public class C3EcgActivity extends BaseActivity{
 					default:
 						Log.e(TAG,"This shouldn't happen. Which: "+which);
 				}
+				//Unpair device.
+				Utils.setPairedDevice(getBaseContext(),"");
 			}
 		});
 

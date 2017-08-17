@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,12 +24,12 @@ import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
-import com.cortrium.cortriumc3.ApiConnection.models.Recordings;
+import com.cortrium.cortriumc3.ApiConnection.models.Events;
 import com.cortrium.opkit.CortriumC3;
 import com.cortrium.opkit.Utils;
 import com.cortrium.opkit.datapackages.EcgData;
+import com.cortrium.opkit.datapackages.SpO2Data;
 import com.cortrium.opkit.datatypes.ECGSamples;
-import com.cortrium.opkit.datatypes.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,7 @@ public class C3EcgFragment extends Fragment {
     @BindView(R.id.temperature_ambient) TextView mAmbientTemperature;
     @BindView(R.id.heart_rate) TextView mHeartRate;
     @BindView(R.id.respiration_rate) TextView mRespirationRate;
+    @BindView(R.id.oximeter_measurement) TextView mOximeterValue;
     @BindView(R.id.ecg1_plot) XYPlot mEcg1Plot;
     @BindView(R.id.ecg2_plot) XYPlot   mEcg2Plot;
     @BindView(R.id.ecg3_plot) XYPlot   mEcg3Plot;
@@ -68,7 +70,7 @@ public class C3EcgFragment extends Fragment {
 
     public Snackbar mySnackbar = null;
     private boolean shownTools = false;
-    private List<Event> eventList = new ArrayList<>();
+    private List<Events> eventList = new ArrayList<>();
 
     @OnClick(R.id.main_layout_fragment) void screenTouch(){
 
@@ -100,7 +102,7 @@ public class C3EcgFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //Add event
-                eventList.add(new Event(input.getText().toString()));
+                eventList.add(new Events(input.getText().toString()));
                 screenTouch();
                 Toast.makeText(getContext(),"Event saved",Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Event saved");
@@ -218,8 +220,12 @@ public class C3EcgFragment extends Fragment {
         mRespirationPlot.addSeries(mRespirationSeries, mPlotFormatter);
     }
 
-    public void clearUI()
-    {
+    public void clearUI() {
+        if(mDeviceBodyPosition == null) return;
+        if(mAmbientTemperature == null) return;
+        if(mHeartRate == null) return;
+        if(mRespirationPlot == null) return;
+
         mDeviceBodyPosition.setText(null);
         //mSensorMode.setText(null);
         mAmbientTemperature.setText(null);
@@ -268,6 +274,14 @@ public class C3EcgFragment extends Fragment {
         }
     }
 
+    public void onSpO2DataUploaded(SpO2Data spO2Data){
+        if(isUIready){
+            mOximeterValue.setText(String.valueOf(spO2Data.getSpO2()));
+            //  TODO: Change this HR from the MiscInfo's HR?
+            // mHeartRate.setText(spO2Data.getHeartRate());
+        }
+    }
+
     private void plotEcgValues(SimpleXYSeries ecgSeries, int[] filteredEcgSamples)
     {
         for (int index = 0; index < ECGSamples.NUMBER_OF_SAMPLES; index++)
@@ -305,7 +319,7 @@ public class C3EcgFragment extends Fragment {
         .setAction("UPLOAD",listener);
     }
 
-    public List<Event> getEventList() {
+    public List<Events> getEventList() {
         return eventList;
     }
 }

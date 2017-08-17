@@ -5,14 +5,21 @@ import android.util.Log;
 
 import com.cortrium.cortriumc3.ApiConnection.models.Recordings;
 import com.cortrium.cortriumc3.R;
+import com.cortrium.cortriumc3.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -133,6 +140,8 @@ public class ApiConnectionManager {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Log.d(TAG+"-Upload "+bleFile.getName(),response.message());
                 successfullUploadRequest = true;
+                //Delete the copy of the current file.
+                bleFile.delete();
             }
 
             @Override
@@ -161,6 +170,41 @@ public class ApiConnectionManager {
                 t.printStackTrace();
             }
         });
+    }
+
+    public void uploadSavedRecording(File recording){
+        Recordings myRecording = getHeaders(recording);
+        postRecordingToAPI(myRecording,recording);
+    }
+
+    public static Recordings getHeaders(File file){
+        byte[] buffer = new byte[48];
+        InputStream is = null;
+        try {
+            is = new FileInputStream(file);
+            if (is.read(buffer) != buffer.length) {
+                // do something
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                is.close();
+            } catch (IOException e) {}
+        }
+        String header = null;
+        try {
+            header = new String(buffer, "UTF-8");
+            String constant = header.substring(0,6);
+            String fileFormatVersion = header.substring(7,9);
+            String deviceId = header.substring(10,25);
+            String firmwareVersion = header.substring(26,38);
+            String hardwareVersion = header.substring(39,46);
+            String companySpecific = header.substring(47,47);
+            return Utils.generateRecordings(deviceId,firmwareVersion,hardwareVersion,file.getName(),0);
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
     }
 }
 

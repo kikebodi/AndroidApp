@@ -41,6 +41,14 @@ public class Events {
         this.id = id;
     }
 
+    public Events(String name) {
+        super();
+        this.name = name;
+        this.identifier = null;
+        this.logged = null;
+        this.id = null;
+    }
+
     public String getName() {
         return name;
     }

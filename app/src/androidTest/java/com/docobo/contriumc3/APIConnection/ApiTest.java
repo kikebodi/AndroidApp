@@ -1,7 +1,6 @@
 package com.docobo.contriumc3.APIConnection;
 
 import android.content.Context;
-import android.os.Environment;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
@@ -10,7 +9,6 @@ import com.cortrium.cortriumc3.ApiConnection.ApiConnectionManager;
 import com.cortrium.cortriumc3.ApiConnection.models.Channels;
 import com.cortrium.cortriumc3.ApiConnection.models.Device;
 import com.cortrium.cortriumc3.ApiConnection.models.Recordings;
-import com.cortrium.cortriumc3.CortriumC3Ecg;
 import com.cortrium.cortriumc3.R;
 
 import org.junit.Assert;
@@ -19,8 +17,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -41,8 +37,6 @@ public class ApiTest {
     public void setUp(){
         instrumentationContext = InstrumentationRegistry.getContext();
     }
-
-
 
     @Test
     public void testGET() throws InterruptedException {

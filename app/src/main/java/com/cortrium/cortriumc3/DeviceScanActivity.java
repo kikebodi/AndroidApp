@@ -311,7 +311,7 @@ public class DeviceScanActivity extends ListActivity {
 
         public void addDevice(CortriumC3 device) {
             if (!mLeDevices.contains(device)) {
-                if(paired_id.compareTo(device.getName()) == 0)
+                if(device.getName() != null && paired_id.compareTo(device.getName()) == 0)
                     connectToDevice(device);
                 else{
                     mLeDevices.add(device);

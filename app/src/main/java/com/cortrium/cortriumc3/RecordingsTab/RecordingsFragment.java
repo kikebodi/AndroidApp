@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
+import com.cortrium.cortriumc3.ApiConnection.ApiConnectionManager;
 import com.cortrium.cortriumc3.C3EcgActivity;
 import com.cortrium.cortriumc3.R;
 
@@ -88,6 +89,8 @@ public class RecordingsFragment extends Fragment {
             @Override
             public void uploadItem(int pos) {
                 Log.d(TAG, "upload "+pos);
+                ApiConnectionManager connector = new ApiConnectionManager(getContext().getResources().getString(R.string.api_url));
+                connector.uploadSavedRecording(files.get(pos));
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -105,7 +108,6 @@ public class RecordingsFragment extends Fragment {
         });
 
         disconnectFab.setOnClickListener(((C3EcgActivity)getActivity()).getFabOnCLickListener());
-
     }
 
     public void setFabOnClickListener(OnClickListener listener){
@@ -129,10 +131,11 @@ public class RecordingsFragment extends Fragment {
     public List<File> getRecordingsFromInternalStorage(){
         File mainDirectory = new File(getContext().getExternalFilesDir(null)+File.separator+FOLDER_NAME);
         File[] directories = mainDirectory.listFiles();
-        //File[] files = new File[directories.length];
         List<File> files = new ArrayList<>();
         for(int i=0;i<directories.length;i++){
-            files.add(directories[i].listFiles()[0]);
+            if(directories[i].listFiles().length > 0){
+                files.add(directories[i].listFiles()[0]);
+            }
         }
         return files;
     }
