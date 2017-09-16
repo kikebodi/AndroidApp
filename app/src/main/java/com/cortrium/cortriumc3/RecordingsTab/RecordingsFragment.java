@@ -130,14 +130,20 @@ public class RecordingsFragment extends Fragment {
 
     public List<File> getRecordingsFromInternalStorage(){
         File mainDirectory = new File(getContext().getExternalFilesDir(null)+File.separator+FOLDER_NAME);
-        File[] directories = mainDirectory.listFiles();
-        List<File> files = new ArrayList<>();
-        for(int i=0;i<directories.length;i++){
-            if(directories[i].listFiles().length > 0){
-                files.add(directories[i].listFiles()[0]);
+        // Check if exists
+        if(mainDirectory.isDirectory()){
+            File[] directories = mainDirectory.listFiles();
+            List<File> files = new ArrayList<>();
+            for(int i=0;i<directories.length;i++){
+                if(directories[i].listFiles().length > 0){
+                    files.add(directories[i].listFiles()[0]);
+                }
             }
+            return files;
+        }else {
+            List<File> emptyList = new ArrayList<>();
+            return emptyList;
         }
-        return files;
     }
 
     public void deleteFile(int position){
